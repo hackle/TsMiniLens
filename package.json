@@ -1,0 +1,23 @@
+{
+  "name": "tsminilens",
+  "version": "1.0.0",
+  "description": "mini Lens for TypeScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hackle/TsMiniLens.git"
+  },
+  "keywords": [
+    "Lens",
+    "TypeScript"
+  ],
+  "author": "Hackle Wayne",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hackle/TsMiniLens/issues"
+  },
+  "homepage": "https://github.com/hackle/TsMiniLens#readme"
+}
