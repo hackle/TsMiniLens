@@ -1,11 +1,11 @@
 # TsMiniLens
-A mini Lens for TypeScript
+Type-safe mini Lens for TypeScript
 
-Minimalistic functions to help with viewing / updating nested data structures.
+Functions such as ``view()``, ``set()`` and ``over()`` to help with viewing / updating nested data structures.
 
 Null values are short-circuited, thus avoiding null reference errors.
 
-Immutability is supported with ``set()``, after which the data structure is updated from leaf to root (but not unrelated branches). (There must be a smarter way to put this so help me out!)
+Immutability is supported with ``set()`` and ``over``, after which the data structure is updated from leaf to root (but not unrelated branches). (There must be a smarter way to put this so help me out!)
 
 given
 
