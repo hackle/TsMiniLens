@@ -13,7 +13,7 @@ given
 interface Address { city?: string; street: string };
 interface Person { name?: string; address: Address };
 
-const lensPerson2Street = lensFor<Person>().with('address', 'street');
+const lensPerson2Street = lensFor<Person>().withPath('address', 'street');
 ```
 
 we have these assertions:

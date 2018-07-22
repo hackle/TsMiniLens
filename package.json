@@ -1,9 +1,11 @@
 {
   "name": "tsminilens",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "mini Lens for TypeScript",
-  "main": "index.js",
+  "main": "dist/lens.js",
+  "types": "dist/lens.d.ts",
   "scripts": {
+    "build": "tsc",
     "test": "jasmine-ts \"./**/*.spec.ts\""
   },
   "repository": {
