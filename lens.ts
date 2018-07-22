@@ -1,4 +1,4 @@
-function mapNullable (f, n?) { return n == null ? n : f(n); }
+function mapNullable (f, n) { return n == null ? n : f(n); }
 
 class Lens<T, TField> {
     constructor(public fields: any[]) {
