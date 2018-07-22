@@ -32,4 +32,4 @@ expect(lensPerson2Street.view(updated)).toEqual('bar');
 
 ```
 
-see ```lens.spec.ts`` for more examples.
+see **lens.spec.ts** for more examples.
