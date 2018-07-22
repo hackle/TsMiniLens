@@ -1,4 +1,4 @@
-# TsMiniLens： Type-safe mini Lens for TypeScript
+# TsMiniLens: Type-safe mini Lens for TypeScript
 
 ```
 npm i tsminilens
@@ -8,7 +8,7 @@ Functions such as ``view()``, ``set()`` and ``over()`` to help with viewing / up
 
 Null values are short-circuited, thus avoiding null reference errors.
 
-Immutability is supported with ``set()`` and ``over``, after which the data structure is updated from leaf to root (but not unrelated branches). (There must be a smarter way to put this so help me out!)
+Immutability is supported with ``set()`` and ``over()``, after which the data structure is updated from leaf to root (but not unrelated branches remain unchanged). (There must be a smarter way to put this so help me out!)
 
 given
 
