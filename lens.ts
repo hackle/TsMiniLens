@@ -27,14 +27,14 @@ class Lens<T, TField> {
 }
 
 export type LensMaker<T> = {
-    with(): Lens<T, T>;
-    with<
+    withPath(): Lens<T, T>;
+    withPath<
         P1 extends keyof T
         >(
             p1: P1
         ): Lens<T, T[P1]>;
 
-    with<
+    withPath<
         P1 extends keyof T, 
         P2 extends keyof T[P1]
         >(
@@ -42,7 +42,7 @@ export type LensMaker<T> = {
             p2: P2
         ): Lens<T, T[P1][P2]>;
     
-    with<
+    withPath<
         P1 extends keyof T, 
         P2 extends keyof T[P1],
         P3 extends keyof T[P1][P2]
@@ -55,6 +55,6 @@ export type LensMaker<T> = {
 
 export function lensFor<T>(): LensMaker<T> {
     return <any>{
-        with(...ps: string[]) { return new Lens(ps); }
+        withPath(...ps: string[]) { return new Lens(ps); }
     };
 }

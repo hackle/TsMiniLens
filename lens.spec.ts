@@ -9,7 +9,7 @@ const duplicate = x => x + x;
 
 describe('Mini Lens for TypeScript', () => {
     describe('Dumb, no path', () => {
-        const dumbLens = lensFor<string>().with();
+        const dumbLens = lensFor<string>().withPath();
 
         it('can view', () => {
             expect(dumbLens.view('foo')).toEqual('foo');
@@ -25,7 +25,7 @@ describe('Mini Lens for TypeScript', () => {
     });
 
     describe('Through nested objects', () => {
-        const lensPerson2Street = lensFor<Person>().with('address', 'street');
+        const lensPerson2Street = lensFor<Person>().withPath('address', 'street');
 
         it('can view', () => {
             expect(lensPerson2Street.view({ address: { street: 'foo' }})).toEqual('foo');
@@ -65,7 +65,7 @@ describe('Mini Lens for TypeScript', () => {
     });
 
     describe('cast union type', () => {
-        const lens4CompanyTitle = lensFor<House>().with('owner').cast<Company>().then(lensFor<Company>().with('title'));
+        const lens4CompanyTitle = lensFor<House>().withPath('owner').cast<Company>().then(lensFor<Company>().withPath('title'));
 
         it('can view', () => {            
             expect(lens4CompanyTitle.view({ owner: { title: 'title foo' }})).toEqual('title foo');
