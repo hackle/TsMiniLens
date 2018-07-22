@@ -12,7 +12,7 @@ class Lens<T, TField> {
         return this.over(obj, _ => val);
     }
 
-    over(obj: T, func: (val: TField) => TField): T {        
+    over(obj: T, func: (val: TField) => TField): T {
         return this.fields.reduceRight(
             (st, cur) => next => mapNullable(_ => ({ ...next, [cur]: st(next[cur]) }), next),
             func
