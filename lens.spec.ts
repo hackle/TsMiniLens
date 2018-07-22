@@ -1,52 +1,89 @@
 import { lensFor, LensMaker } from './lens';
 
-interface Address { city: string; street: string };
-interface Person { name: string; address: Address };
+interface Address { city?: string; street: string };
+interface Person { name?: string; address: Address };
 interface Company { title: string }
 interface House { owner: Person | Company };
 
-const lHouse2Street = lensFor<House>().with('owner').cast<Company>().then(lensFor<Company>().with('title'));
+const duplicate = x => x + x;
 
-console.log('view through union type, company: ', lHouse2Street.view({ owner: { title: 'title foo' }}));
-console.log('update through union type, company: ', lHouse2Street.set({ owner: { title: 'title foo' } }, 'title bar'));
+describe('Mini Lens for TypeScript', () => {
+    describe('Dumb, no path', () => {
+        const dumbLens = lensFor<string>().with();
 
-// const lens4address = Lens.for<Person>().with("address", "street");
-// const withAddress = { name: "foo", address: { city: "AKL", street: "sale" }};
-// const noAddress: Person = { name: "foo", address: null };
+        it('can view', () => {
+            expect(dumbLens.view('foo')).toEqual('foo');
+        });
 
-// console.log("view street of no address", lens4address.view(noAddress));
-// console.log("view street of with address", lens4address.view(withAddress));
-// const lensAddress2Street = new Lens<Address, string>([ 'street' ]);
-// console.log(
-//     "set address.street from foo to bar",
-//     lensAddress2Street.set1({ city: 'akl', street: 'foo' }, 'bar'), 
-//     lensAddress2Street.set2({ city: 'akl', street: 'foo' }, 'bar'));
+        it('can set', () => {
+            expect(dumbLens.set('foo', 'bar')).toEqual('bar');
+        });
 
-// var lensPerson2Street = new Lens<Person, string>([ 'address', 'street' ]);
-// console.log(
-//     "set person.address.street from foo to bar",
-//     lensPerson2Street.set1({ name: 'name', address: { city: 'akl', street: 'foo' } }, 'bar'), 
-//     lensPerson2Street.set2({ name: 'name', address: { city: 'akl', street: 'foo' } }, 'bar')
-// );
+        it('can override', () => {
+            expect(dumbLens.over('foo', duplicate)).toEqual('foofoo');
+        });
+    });
 
-// console.log(
-//     "set person no address from foo to bar",
-//     lensPerson2Street.set1({ name: 'name', address: null }, 'bar'), 
-//     lensPerson2Street.set2({ name: 'name', address: null }, 'bar')
-// );
+    describe('Through nested objects', () => {
+        const lensPerson2Street = lensFor<Person>().with('address', 'street');
 
-// console.log(
-//     "set person.address.street with null",
-//     lensPerson2Street.set1(null, 'foo'),
-//     lensPerson2Street.set2(null, 'foo')
-// );
+        it('can view', () => {
+            expect(lensPerson2Street.view({ address: { street: 'foo' }})).toEqual('foo');
+        });
 
-// console.log(lens4address.set1(withAddress, "queen"), lens4address.set2(withAddress, "queen"));
-// console.log(lens4address.set1(noAddress, "queen"), noAddress);
-// console.log(lens4address.set1(null, "queen"), null);
+        it('view can short circuit null values', () => {
+            expect(lensPerson2Street.view(null)).toBeNull();
+            expect(lensPerson2Street.view({ address: null })).toBeNull();
+        });
 
-// const house: House = { owner: { name: 'foo', address: { city: 'Auckland', street: 'queen' }}};
-// const addressL = Lens.for<House>().with('owner', 'address');
-// const houseUpdated = addressL.set1(house, { city: 'Wellington', street: 'Cuba'});
-// console.log(houseUpdated);
+        it('can set', () => {
+            const withAddress = { address: { street: 'foo' } };
+            const updated = lensPerson2Street.set(withAddress, 'bar');
+            expect(lensPerson2Street.view(updated)).toEqual('bar');
 
+            // but not reference equal
+            expect(updated).not.toBe(withAddress);
+        });
+
+        it('set can short-circuit null values', () => {
+            const noAddress = { address: null };
+            const updated = lensPerson2Street.set(noAddress, 'bar');
+            expect(updated).toEqual(noAddress);
+
+            // but not reference equal
+            expect(updated).not.toBe(noAddress);
+        });
+
+        it('can override', () => {
+            const withAddress = { address: { street: 'foo' } };
+            const updated = lensPerson2Street.over(withAddress, duplicate);
+            expect(lensPerson2Street.view(updated)).toEqual('foofoo');
+
+            // but not reference equal
+            expect(updated).not.toBe(withAddress);
+        });
+    });
+
+    describe('cast union type', () => {
+        const lens4CompanyTitle = lensFor<House>().with('owner').cast<Company>().then(lensFor<Company>().with('title'));
+
+        it('can view', () => {            
+            expect(lens4CompanyTitle.view({ owner: { title: 'title foo' }})).toEqual('title foo');
+        });
+
+        it('can not view incorrect variant', () => {
+            expect(lens4CompanyTitle.view({ owner: { name: 'foo', address: null } })).toBeUndefined();
+        });
+
+        it('can set', () => {
+            const updated = lens4CompanyTitle.set({ owner: { title: 'title foo' } }, 'title bar');
+            expect(lens4CompanyTitle.view(updated)).toEqual('title bar');
+        });
+        
+        xit('can not set incorrect variant', () => {
+            const withoutCompany = { owner: { name: 'foo', address: null } };
+            const updated = lens4CompanyTitle.set(withoutCompany, 'title bar');
+            expect(updated).toEqual(withoutCompany);
+        });
+    });
+});

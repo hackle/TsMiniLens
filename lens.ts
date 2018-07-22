@@ -27,6 +27,7 @@ class Lens<T, TField> {
 }
 
 export type LensMaker<T> = {
+    with(): Lens<T, T>;
     with<
         P1 extends keyof T
         >(
