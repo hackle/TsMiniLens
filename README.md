@@ -1,5 +1,8 @@
-# TsMiniLens
-Type-safe mini Lens for TypeScript
+# TsMiniLens： Type-safe mini Lens for TypeScript
+
+```
+npm i tsminilens
+```
 
 Functions such as ``view()``, ``set()`` and ``over()`` to help with viewing / updating nested data structures.
 
