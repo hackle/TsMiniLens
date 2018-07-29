@@ -1,8 +1,8 @@
-import { lensFor, LensMaker } from './lens';
+import { lensFor, LensMaker, chain } from './lens';
 
 interface Address { city?: string; street: string };
-interface Person { name?: string; address: Address };
-interface Company { title: string }
+interface Person { type: 'Person', name?: string; address: Address };
+interface Company { type: 'Company', title: string }
 interface House { owner: Person | Company };
 
 const duplicate = x => x + x;
@@ -28,16 +28,16 @@ describe('Mini Lens for TypeScript', () => {
         const lensPerson2Street = lensFor<Person>().withPath('address', 'street');
 
         it('can view', () => {
-            expect(lensPerson2Street.view({ address: { street: 'foo' }})).toEqual('foo');
+            expect(lensPerson2Street.view({ address: { street: 'foo' }, type: 'Person' })).toEqual('foo');
         });
 
         it('view can short circuit null values', () => {
             expect(lensPerson2Street.view(null)).toBeNull();
-            expect(lensPerson2Street.view({ address: null })).toBeNull();
+            expect(lensPerson2Street.view({ address: null, type: 'Person' })).toBeNull();
         });
 
         it('can set', () => {
-            const withAddress = { address: { street: 'foo' } };
+            const withAddress: Person = { address: { street: 'foo' }, type: 'Person' };
             const updated = lensPerson2Street.set(withAddress, 'bar');
             expect(lensPerson2Street.view(updated)).toEqual('bar');
 
@@ -46,7 +46,7 @@ describe('Mini Lens for TypeScript', () => {
         });
 
         it('set can short-circuit null values', () => {
-            const noAddress = { address: null };
+            const noAddress: Person = { address: null, type: 'Person' };
             const updated = lensPerson2Street.set(noAddress, 'bar');
             expect(updated).toEqual(noAddress);
 
@@ -55,7 +55,7 @@ describe('Mini Lens for TypeScript', () => {
         });
 
         it('can override', () => {
-            const withAddress = { address: { street: 'foo' } };
+            const withAddress: Person = { address: { street: 'foo' }, type: 'Person' };
             const updated = lensPerson2Street.over(withAddress, duplicate);
             expect(lensPerson2Street.view(updated)).toEqual('foofoo');
 
@@ -64,26 +64,31 @@ describe('Mini Lens for TypeScript', () => {
         });
     });
 
-    describe('cast union type', () => {
-        const lens4CompanyTitle = lensFor<House>().withPath('owner').cast<Company>().then(lensFor<Company>().withPath('title'));
+    describe('chain lens / cast through union type', () => {
+        const isCompany = (c: Person | Company): c is Company => c.type === 'Company';
+
+        const lens4CompanyTitle = lensFor<House>().withPath('owner')
+            .castIf<Company>(isCompany)
+            .chain(lensFor<Company>().withPath('title'));
 
         it('can view', () => {            
-            expect(lens4CompanyTitle.view({ owner: { title: 'title foo' }})).toEqual('title foo');
+            expect(lens4CompanyTitle.view({ owner: { title: 'title foo', type: 'Company' } })).toEqual('title foo');
         });
 
         it('can not view incorrect variant', () => {
-            expect(lens4CompanyTitle.view({ owner: { name: 'foo', address: null } })).toBeUndefined();
+            expect(lens4CompanyTitle.view({ owner: { name: 'foo', address: null, type: 'Person' } })).toBeUndefined();
         });
 
         it('can set', () => {
-            const updated = lens4CompanyTitle.set({ owner: { title: 'title foo' } }, 'title bar');
+            const updated = lens4CompanyTitle.set({ owner: { title: 'title foo', type: 'Company' } }, 'title bar');
             expect(lens4CompanyTitle.view(updated)).toEqual('title bar');
         });
         
-        xit('can not set incorrect variant', () => {
-            const withoutCompany = { owner: { name: 'foo', address: null } };
+        it('can not set incorrect variant', () => {
+            const notACompany = { name: 'foo', address: null, type: 'Person' };
+            const withoutCompany = { owner: <any>notACompany };
             const updated = lens4CompanyTitle.set(withoutCompany, 'title bar');
-            expect(updated).toEqual(withoutCompany);
+            expect(updated).toEqual(withoutCompany, 'object should not have changed even set fails');
         });
     });
 });
