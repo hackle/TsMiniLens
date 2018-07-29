@@ -35,4 +35,6 @@ expect(lensPerson2Street.view(updated)).toEqual('bar');
 
 ```
 
+It's also possible to ``cast()`` and ``chain()`` lenses.
+
 see **lens.spec.ts** for more examples.

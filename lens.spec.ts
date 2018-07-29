@@ -5,6 +5,8 @@ interface Person { type: 'Person', name?: string; address: Address };
 interface Company { type: 'Company', title: string }
 interface House { owner: Person | Company };
 
+const isCompany = (c: Person | Company): c is Company => c.type === 'Company';
+const isPerson = (c:Person | Company): c is Person => c.type === 'Person';
 const duplicate = x => x + x;
 
 describe('Mini Lens for TypeScript', () => {
@@ -65,8 +67,6 @@ describe('Mini Lens for TypeScript', () => {
     });
 
     describe('chain lens / cast through union type', () => {
-        const isCompany = (c: Person | Company): c is Company => c.type === 'Company';
-
         const lens4CompanyTitle = lensFor<House>().withPath('owner')
             .castIf<Company>(isCompany)
             .chain(lensFor<Company>().withPath('title'));
@@ -89,6 +89,44 @@ describe('Mini Lens for TypeScript', () => {
             const withoutCompany = { owner: <any>notACompany };
             const updated = lens4CompanyTitle.set(withoutCompany, 'title bar');
             expect(updated).toEqual(withoutCompany, 'object should not have changed even set fails');
+        });
+    });
+
+    describe('chain and cast galore', () => {
+        const lensGalore = lensFor<House>().withPath('owner').castIf(isPerson)
+            .chain(lensFor<Person>().withPath('address', 'neighbor', 'owner').castIf(isCompany))
+            .chain(lensFor<Company>().withPath('title'));
+
+        it('with valid data', () => {
+            const nested: House = {
+                owner: <Person>{
+                    type: 'Person',
+                    address: {
+                        street: null,
+                        neighbor: {
+                            owner: {
+                                type: 'Company',
+                                title: 'bar'
+                            }
+                        }
+                    }
+                }
+            };
+            expect(lensGalore.view(nested)).toEqual('bar', 'view fails');
+            expect(lensGalore.view(lensGalore.set(nested, 'bar'))).toEqual('bar', 'set fails');
+        });
+
+        it('with invalid data', () => {
+            const nested: House = {
+                owner: <Person>{
+                    type: 'Person',
+                    address: {
+                        street: null
+                    }
+                }
+            };
+            expect(lensGalore.view(nested)).toBeUndefined('view fails');
+            expect(lensGalore.view(lensGalore.set(nested, 'bar'))).toBeUndefined('set fails');
         });
     });
 });
