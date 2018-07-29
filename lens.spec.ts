@@ -1,6 +1,6 @@
 import { lensFor, LensMaker, chain } from './lens';
 
-interface Address { city?: string; street: string };
+interface Address { city?: string; street: string; neighbor?: House };
 interface Person { type: 'Person', name?: string; address: Address };
 interface Company { type: 'Company', title: string }
 interface House { owner: Person | Company };

@@ -114,6 +114,18 @@ export type LensMaker<T> = {
             p2: P2,
             p3: P3
         ): SimpleLens<T, T[P1][P2][P3]>;
+    
+    withPath<
+        P1 extends keyof T, 
+        P2 extends keyof T[P1],
+        P3 extends keyof T[P1][P2],
+        P4 extends keyof T[P1][P2][P3],
+        >(
+            p1: P1, 
+            p2: P2,
+            p3: P3,
+            p4: P4
+        ): SimpleLens<T, T[P1][P2][P3][P4]>;
 };
 
 export function chain<T, TField, TField1>(
