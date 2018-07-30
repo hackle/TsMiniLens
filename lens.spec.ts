@@ -1,4 +1,4 @@
-import { lensFor, LensMaker, chain } from './lens';
+import { lensFor, chain } from './lens';
 
 interface Address { city?: string; street: string; neighbor?: House };
 interface Person { type: 'Person', name?: string; address: Address };

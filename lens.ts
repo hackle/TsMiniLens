@@ -1,3 +1,5 @@
+import { LensMaker } from "./lensMaker";
+
 function mapNullable (f, n) { return n == null ? n : f(n); }
 
 export abstract class Lens<T, TField> {
@@ -88,45 +90,6 @@ export class ChainedLens<TRoot, TField, TField1> extends Lens<TRoot, TField1> {
         return this.inner1.over(obj, fld => this.inner2.over(fld, func));
     }
 }
-
-export type LensMaker<T> = {
-    withPath(): Lens<T, T>;
-    withPath<
-        P1 extends keyof T
-        >(
-            p1: P1
-        ): SimpleLens<T, T[P1]>;
-
-    withPath<
-        P1 extends keyof T, 
-        P2 extends keyof T[P1]
-        >(
-            p1: P1, 
-            p2: P2
-        ): SimpleLens<T, T[P1][P2]>;
-    
-    withPath<
-        P1 extends keyof T, 
-        P2 extends keyof T[P1],
-        P3 extends keyof T[P1][P2]
-        >(
-            p1: P1, 
-            p2: P2,
-            p3: P3
-        ): SimpleLens<T, T[P1][P2][P3]>;
-    
-    withPath<
-        P1 extends keyof T, 
-        P2 extends keyof T[P1],
-        P3 extends keyof T[P1][P2],
-        P4 extends keyof T[P1][P2][P3],
-        >(
-            p1: P1, 
-            p2: P2,
-            p3: P3,
-            p4: P4
-        ): SimpleLens<T, T[P1][P2][P3][P4]>;
-};
 
 export function chain<T, TField, TField1>(
         lens1: Lens<T, TField>,
