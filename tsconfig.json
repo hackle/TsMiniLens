@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
-        "target": "es2016",
+        "module": "es2015",
+        "target": "es5",
         "jsx": "preserve",
-        "lib": ["es2015", "es2017", "dom"],
+        "lib": ["es6", "dom", "ES2016.Array.Include"],
         "alwaysStrict": true,
         "declaration": true,
         "outDir": "./dist",
