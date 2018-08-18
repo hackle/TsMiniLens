@@ -4,11 +4,13 @@
 npm i tsminilens
 ```
 
-Functions such as ``view()``, ``set()`` and ``over()`` to help with viewing / updating nested JSON objects.
+A type-safe way to navigate through nested JSON objects. Writtin in TypeScript so enjoy intellisense and compiler errors!
 
-Null values are short-circuited, thus avoiding null reference errors.
+Provides the usual functions such as ``view()``, ``set()`` and ``over()``.
 
-Supports navigating through union types (with type guards).
+Null values are short-circuited, thus avoiding the dreaded null reference errors.
+
+Also supports navigating through union types - with type guards.
 
 Immutability is supported with ``set()`` and ``over()``, after which the data structure is updated from leaf to root (but unrelated branches remain unchanged). (There must be a smarter way to put this so help me out!)
 
