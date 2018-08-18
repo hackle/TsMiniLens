@@ -4,11 +4,15 @@
 npm i tsminilens
 ```
 
-Functions such as ``view()``, ``set()`` and ``over()`` to help with viewing / updating nested data structures.
+Functions such as ``view()``, ``set()`` and ``over()`` to help with viewing / updating nested JSON objects.
 
 Null values are short-circuited, thus avoiding null reference errors.
 
-Immutability is supported with ``set()`` and ``over()``, after which the data structure is updated from leaf to root (but not unrelated branches remain unchanged). (There must be a smarter way to put this so help me out!)
+Supports navigating through union types (with type guards).
+
+Immutability is supported with ``set()`` and ``over()``, after which the data structure is updated from leaf to root (but unrelated branches remain unchanged). (There must be a smarter way to put this so help me out!)
+
+Bear in mind it's mini indeed - there is no support for navigating through arrays, Maps or other complex data types.
 
 given
 
@@ -16,7 +20,7 @@ given
 interface Address { city?: string; street: string };
 interface Person { name?: string; address: Address };
 
-const lensPerson2Street = lensFor<Person>().withPath('address', 'street');
+const lensPerson2Street = lensFor<Person>().withPath('address', 'street'); // this is type safe, e.g. 'street1' wont't compile
 ```
 
 we have these assertions:
@@ -35,6 +39,6 @@ expect(lensPerson2Street.view(updated)).toEqual('bar');
 
 ```
 
-It's also possible to ``cast()`` and ``chain()`` lenses.
+It's also possible to cast and chain lenses.
 
 see **lens.spec.ts** for more examples.
