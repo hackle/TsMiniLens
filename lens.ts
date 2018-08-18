@@ -1,4 +1,4 @@
-import { LensMaker } from "./lensMaker";
+import { LensMaker, ObscureLensMaker } from "./lensMaker";
 
 function mapNullable (f, n) { return n == null ? n : f(n); }
 
@@ -17,6 +17,15 @@ export abstract class Lens<T, TField> {
         lens1: Lens<TField, TField1>
     ): Lens<T, TField1> {
         return chain(this, lens1);
+    }
+
+    /*
+    chain lenses in a slightly more fluent way than chain()
+    */
+    get then(): ObscureLensMaker<T, TField> {
+        return <any>{
+            withPath: (...ps: string[]) => chain(this, new SimpleLens(ps))
+        };
     }
 
     abstract view(obj: T): TField;
