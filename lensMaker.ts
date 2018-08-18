@@ -1,18 +1,12 @@
 import { SimpleLens } from "./lens";
 
-/*
-This is obscure indeed - help simplify!
-Think THost and T as the same type being navigated.
-They should only be different when we try to chain 2 lenses, one for THost and one for T.
-See its usage in LensMaker<T>, as well as then() in lens.ts
-*/
-export type ObscureLensMaker<THost, T> = {
-    withPath(): SimpleLens<THost, T>;
+export type ChainedLensMaker<TFrom, T> = {
+    withPath(): SimpleLens<TFrom, T>;
     withPath<
         P1 extends keyof T
         >(
             p1: P1
-        ): SimpleLens<THost, T[P1]>;
+        ): SimpleLens<TFrom, T[P1]>;
 
     withPath<
         P1 extends keyof T, 
@@ -20,7 +14,7 @@ export type ObscureLensMaker<THost, T> = {
         >(
             p1: P1, 
             p2: P2
-        ): SimpleLens<THost, T[P1][P2]>;
+        ): SimpleLens<TFrom, T[P1][P2]>;
     
     withPath<
         P1 extends keyof T, 
@@ -30,7 +24,7 @@ export type ObscureLensMaker<THost, T> = {
             p1: P1, 
             p2: P2,
             p3: P3
-        ): SimpleLens<THost, T[P1][P2][P3]>;
+        ): SimpleLens<TFrom, T[P1][P2][P3]>;
     
     withPath<
         P1 extends keyof T, 
@@ -42,7 +36,7 @@ export type ObscureLensMaker<THost, T> = {
             p2: P2,
             p3: P3,
             p4: P4
-        ): SimpleLens<THost, T[P1][P2][P3][P4]>;
+        ): SimpleLens<TFrom, T[P1][P2][P3][P4]>;
     
     withPath<
         P1 extends keyof T, 
@@ -56,7 +50,7 @@ export type ObscureLensMaker<THost, T> = {
             p3: P3,
             p4: P4,
             p5: P5
-        ): SimpleLens<THost, T[P1][P2][P3][P4][P5]>;
+        ): SimpleLens<TFrom, T[P1][P2][P3][P4][P5]>;
     
     withPath<
         P1 extends keyof T, 
@@ -72,7 +66,7 @@ export type ObscureLensMaker<THost, T> = {
             p4: P4,
             p5: P5,
             p6: P6
-        ): SimpleLens<THost, T[P1][P2][P3][P4][P5][P6]>;
+        ): SimpleLens<TFrom, T[P1][P2][P3][P4][P5][P6]>;
     
     withPath<
         P1 extends keyof T, 
@@ -90,7 +84,7 @@ export type ObscureLensMaker<THost, T> = {
             p5: P5,
             p6: P6,
             p7: P7
-        ): SimpleLens<THost, T[P1][P2][P3][P4][P5][P6][P7]>;
+        ): SimpleLens<TFrom, T[P1][P2][P3][P4][P5][P6][P7]>;
     
     withPath<
         P1 extends keyof T, 
@@ -110,7 +104,7 @@ export type ObscureLensMaker<THost, T> = {
             p6: P6,
             p7: P7,
             p8: P8,
-        ): SimpleLens<THost, T[P1][P2][P3][P4][P5][P6][P7][P8]>;
+        ): SimpleLens<TFrom, T[P1][P2][P3][P4][P5][P6][P7][P8]>;
     
     withPath<
         P1 extends keyof T, 
@@ -132,7 +126,7 @@ export type ObscureLensMaker<THost, T> = {
             p7: P7,
             p8: P8,
             p9: P9,
-        ): SimpleLens<THost, T[P1][P2][P3][P4][P5][P6][P7][P8][P9]>;
+        ): SimpleLens<TFrom, T[P1][P2][P3][P4][P5][P6][P7][P8][P9]>;
 };
 
-export type LensMaker<T> = ObscureLensMaker<T, T>;
+export type LensMaker<T> = ChainedLensMaker<T, T>;
