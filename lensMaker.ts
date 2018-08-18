@@ -1,4 +1,4 @@
-import { Lens, SimpleLens } from "./lens";
+import { SimpleLens } from "./lens";
 
 /*
 This is obscure indeed - help simplify!
@@ -7,7 +7,7 @@ They should only be different when we try to chain 2 lenses, one for THost and o
 See its usage in LensMaker<T>, as well as then() in lens.ts
 */
 export type ObscureLensMaker<THost, T> = {
-    withPath(): Lens<THost, T>;
+    withPath(): SimpleLens<THost, T>;
     withPath<
         P1 extends keyof T
         >(
