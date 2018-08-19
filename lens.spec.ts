@@ -129,4 +129,30 @@ describe('Mini Lens for TypeScript', () => {
             expect(lensGalore.view(lensGalore.set(nested, 'bar'))).toBeUndefined('set fails');
         });
     });
+
+    describe('chain with path', () => {
+        const lens4CompanyTitle = lensFor<House>().withPath('owner')
+            .castIf<Company>(isCompany)
+            .then.withPath('title');
+
+        it('can view', () => {            
+            expect(lens4CompanyTitle.view({ owner: { title: 'title foo', type: 'Company' } })).toEqual('title foo');
+        });
+
+        it('can not view incorrect variant', () => {
+            expect(lens4CompanyTitle.view({ owner: { name: 'foo', address: null, type: 'Person' } })).toBeUndefined();
+        });
+
+        it('can set', () => {
+            const updated = lens4CompanyTitle.set({ owner: { title: 'title foo', type: 'Company' } }, 'title bar');
+            expect(lens4CompanyTitle.view(updated)).toEqual('title bar');
+        });
+        
+        it('can not set incorrect variant', () => {
+            const notACompany = { name: 'foo', address: null, type: 'Person' };
+            const withoutCompany = { owner: <any>notACompany };
+            const updated = lens4CompanyTitle.set(withoutCompany, 'title bar');
+            expect(updated).toEqual(withoutCompany, 'object should not have changed even set fails');
+        });
+    });
 });
