@@ -50,7 +50,7 @@ const personRelocated = lensPerson2Street.set(person, 'new street');
 ```
 Note ``personRelocated`` is a different object than ``person``, or, ``person !== personRelocated``.
 
-``over()`` is handy if we are to append to the current address,
+``over()`` is handy if we are to modify (but not replace) the current street,
 ```
 const updatedPerson = lensPerson2Street.over(person, street => 'Level 2' + street);
 ```
@@ -58,8 +58,9 @@ Quiz: how to implement ``set()`` in terms of ``over()``?
 
 ### chain() and castIf()
 
-It's also possible to chain lenses with ``lens.chain(anotherLens)`` or more fluently, ``lens.then.withPath('level1', 'level2')``
+It's also possible to chain lenses with ``lens1.chain(lens1)`` or more fluently, ``lens.then.withPath('level1', 'level2')``
 
-``lens.castIf(typeGuard)`` supports navigating through union types - with type guards.
+``lens.castIf(typeGuard)`` supports navigating through union types safely with type guards.
 
+## Remember it's mini
 Bear in mind it's mini indeed - there is no support for navigating through arrays, Maps or other complex data types.
