@@ -16,7 +16,7 @@ interface Person { name?: string; address: Address };
 const lensPerson2Street = lensFor<Person>().withPath('address', 'street'); // this is type safe, e.g. 'street1' wont't compile
 ```
 
-### Navigate safely
+### view() to navigate safely
 
 We all know the dreaded null reference exception (Law of demeter applies)
 
@@ -30,7 +30,7 @@ with lens this never happens, in the following case, if address is null then vie
 const address = lensPerson2Street.view(person); // safe!
 ```
 
-### update easily
+### set() or over() to update easily
 
 If immutability is a concern, then updating a nested data structure can be tedious.
 ```TypeScript
@@ -38,7 +38,6 @@ const updatedPerson = {
     ...person,
     address: {
         ...person.address,
-        street: 'new street'
     }
 };
 // imagine more nesting! :(
@@ -54,6 +53,7 @@ Note with ``set()``, the result ``personWithNewAddress`` is a new object, or, ``
 ```
 const updatedPerson = lensPerson2Street.over(person, oldAddress => 'Level 2' + oldAddress);
 ```
+### chain() and castIf()
 
 It's also possible to chain lenses with ``lens.chain(anotherLens)`` or more fluently, ``lens.then.withPath('level1', 'level2')``
 
