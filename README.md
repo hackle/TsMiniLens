@@ -4,20 +4,11 @@
 npm i tsminilens
 ```
 
-A type-safe way to navigate through nested JSON objects. Writtin in TypeScript so enjoy intellisense and compiler errors!
+A type-safe and idiomatic way to navigate through nested JSON objects. Writtin in TypeScript so enjoy intellisense and compiler errors! (instead of null reference errors at run time).
 
-Provides the usual functions such as ``view()``, ``set()`` and ``over()``.
+## Use cases
 
-Null values are short-circuited, thus avoiding the dreaded null reference errors.
-
-Also supports navigating through union types - with type guards.
-
-Immutability is supported with ``set()`` and ``over()``, after which the data structure is updated from leaf to root (but unrelated branches remain unchanged). (There must be a smarter way to put this so help me out!)
-
-Bear in mind it's mini indeed - there is no support for navigating through arrays, Maps or other complex data types.
-
-given
-
+### Given
 ```TypeScript
 interface Address { city?: string; street: string };
 interface Person { name?: string; address: Address };
@@ -25,22 +16,47 @@ interface Person { name?: string; address: Address };
 const lensPerson2Street = lensFor<Person>().withPath('address', 'street'); // this is type safe, e.g. 'street1' wont't compile
 ```
 
-we have these assertions:
+### Navigate safely
+
+We all know the dreaded null reference exception (Law of demeter applies)
 
 ```TypeScript
-// view()
-expect(lensPerson2Street.view({ address: { street: 'foo' }})).toEqual('foo');
-
-// null value is short-circuited
-expect(lensPerson2Street.view({ address: null })).toBeNull();
-
-// set()
-const withAddress = { address: { street: 'foo' } };
-const updated = lensPerson2Street.set(withAddress, 'bar');
-expect(lensPerson2Street.view(updated)).toEqual('bar');
-
+const address = person.address.street; // error if address is null!
 ```
 
-It's also possible to cast and chain lenses.
+with lens this never happens, in the following case, if address is null then view() returns null instead of erroring out
 
-see **lens.spec.ts** for more examples.
+```TypeScript
+const address = lensPerson2Street.view(person); // safe!
+```
+
+### update easily
+
+If immutability is a concern, then updating a nested data structure can be tedious.
+```TypeScript
+const updatedPerson = {
+    ...person,
+    address: {
+        ...person.address,
+        street: 'new street'
+    }
+};
+// imagine more nesting! :(
+```
+
+with ``set()`` this becomes a breeze
+```
+const personWithNewAddress = lensPerson2Street.set(person, 'new street');
+```
+Note with ``set()``, the result ``personWithNewAddress`` is a new object, or, ``person !== personWithNewAddress``.
+
+``over()`` is handy if we are to append to the current address,
+```
+const updatedPerson = lensPerson2Street.over(person, oldAddress => 'Level 2' + oldAddress);
+```
+
+It's also possible to chain lenses with ``lens.chain(anotherLens)`` or more fluently, ``lens.then.withPath('level1', 'level2')``
+
+``lens.castIf(typeGuard)`` supports navigating through union types - with type guards.
+
+Bear in mind it's mini indeed - there is no support for navigating through arrays, Maps or other complex data types.
