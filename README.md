@@ -21,13 +21,13 @@ const lensPerson2Street = lensFor<Person>().withPath('address', 'street'); // th
 We all know the dreaded null reference exception (Law of demeter applies)
 
 ```TypeScript
-const address = person.address.street; // error if address is null!
+const street = person.address.street; // error if address is null!
 ```
 
 with lens this never happens, in the following case, if address is null then view() returns null instead of erroring out
 
 ```TypeScript
-const address = lensPerson2Street.view(person); // safe!
+const street = lensPerson2Street.view(person); // safe!
 ```
 
 ### set() or over() to update easily
@@ -38,6 +38,7 @@ const updatedPerson = {
     ...person,
     address: {
         ...person.address,
+        street: 'new street'
     }
 };
 // imagine more nesting! :(
@@ -45,14 +46,16 @@ const updatedPerson = {
 
 with ``set()`` this becomes a breeze
 ```
-const personWithNewAddress = lensPerson2Street.set(person, 'new street');
+const personRelocated = lensPerson2Street.set(person, 'new street');
 ```
-Note with ``set()``, the result ``personWithNewAddress`` is a new object, or, ``person !== personWithNewAddress``.
+Note ``personRelocated`` is a different object than ``person``, or, ``person !== personRelocated``.
 
 ``over()`` is handy if we are to append to the current address,
 ```
-const updatedPerson = lensPerson2Street.over(person, oldAddress => 'Level 2' + oldAddress);
+const updatedPerson = lensPerson2Street.over(person, street => 'Level 2' + street);
 ```
+Quiz: how to implement ``set()`` in terms of ``over()``?
+
 ### chain() and castIf()
 
 It's also possible to chain lenses with ``lens.chain(anotherLens)`` or more fluently, ``lens.then.withPath('level1', 'level2')``
