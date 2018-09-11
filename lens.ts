@@ -115,7 +115,7 @@ export function lensFor<T>(): LensMaker<T> {
 }
 
 // alias for lensFor<T>().withPath()
-export function from<T>() {
+export function lensFrom<T>() {
     return { to: lensFor<T>().withPath };
 }
 

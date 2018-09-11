@@ -1,4 +1,4 @@
-import { lensFor, chain, from } from './lens';
+import { lensFor, chain, lensFrom } from './lens';
 
 interface Address { city?: string; street: string; neighbor?: House };
 interface Person { type: 'Person', name?: string; address: Address };
@@ -157,7 +157,7 @@ describe('Mini Lens for TypeScript', () => {
     });
 
     describe('chain with path -- aliased', () => {
-        const lens4CompanyTitle = from<House>().to('owner')
+        const lens4CompanyTitle = lensFrom<House>().to('owner')
             .castIf<Company>(isCompany)
             .then.to('title');
 

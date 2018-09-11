@@ -14,6 +14,10 @@ interface Address { city?: string; street: string };
 interface Person { name?: string; address: Address };
 
 const lensPerson2Street = lensFor<Person>().withPath('address', 'street'); // this is type safe, e.g. 'street1' wont't compile
+
+// or since version 1.1.6
+const lensPerson2Street = lensFrom<Person>().to('address', 'street');
+
 ```
 
 ### view() to navigate safely
