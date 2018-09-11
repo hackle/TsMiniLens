@@ -22,7 +22,7 @@ export abstract class Lens<T, TField> {
     /*
     chain lenses in a slightly more fluent way than chain()
     */
-    get then(): ChainedLensMakerAlias<T, TField> {
+    get then(): ChainedLensMaker<T, TField> & ChainedLensMakerAlias<T, TField> {
       return <any>{
             withPath: (...ps: string[]) => chain(this, new SimpleLens(ps)),
             to: (...ps: string[]) => chain(this, new SimpleLens(ps)),
@@ -115,7 +115,7 @@ export function lensFor<T>(): LensMaker<T> {
 }
 
 // alias for lensFor<T>().withPath()
-export function lensFrom<T>() {
+export function lensFrom<T>(): LensMakerAlias<T> {
     return { to: lensFor<T>().withPath };
 }
 

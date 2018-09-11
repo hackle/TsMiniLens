@@ -131,5 +131,5 @@ export type ChainedLensMaker<TFrom, T> = {
 
 export type LensMaker<T> = ChainedLensMaker<T, T>;
 
-export type ChainedLensMakerAlias<T1, T2> = ChainedLensMaker<T1, T2> & { to: ChainedLensMaker<T1, T2>['withPath'] };
+export type ChainedLensMakerAlias<T1, T2> = { to: ChainedLensMaker<T1, T2>['withPath'] };
 export type LensMakerAlias<T> = ChainedLensMakerAlias<T, T>;
