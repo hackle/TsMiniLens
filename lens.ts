@@ -1,4 +1,4 @@
-import { LensMaker, ChainedLensMaker } from "./lensMaker";
+import { LensMaker, ChainedLensMaker, ChainedLensMakerAlias, LensMakerAlias } from "./lensMaker";
 
 function mapNullable (f, n) { return n == null ? n : f(n); }
 
@@ -22,9 +22,10 @@ export abstract class Lens<T, TField> {
     /*
     chain lenses in a slightly more fluent way than chain()
     */
-    get then(): ChainedLensMaker<T, TField> {
-        return <any>{
-            withPath: (...ps: string[]) => chain(this, new SimpleLens(ps))
+    get then(): ChainedLensMakerAlias<T, TField> {
+      return <any>{
+            withPath: (...ps: string[]) => chain(this, new SimpleLens(ps)),
+            to: (...ps: string[]) => chain(this, new SimpleLens(ps)),
         };
     }
 
@@ -111,6 +112,11 @@ export function lensFor<T>(): LensMaker<T> {
     return <any>{
         withPath(...ps: string[]) { return new SimpleLens(ps); }
     };
+}
+
+// alias for lensFor<T>().withPath()
+export function from<T>() {
+    return { to: lensFor<T>().withPath };
 }
 
 export function castIf<T, TField, TField1 extends TField>(
