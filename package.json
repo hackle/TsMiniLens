@@ -1,6 +1,6 @@
 {
   "name": "tsminilens",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "mini Lens for TypeScript",
   "main": "dist/lens.js",
   "types": "dist/lens.d.ts",
