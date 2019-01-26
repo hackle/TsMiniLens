@@ -1,0 +1,19 @@
+{
+  "name": "testtsminilens",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine-ts \"./**/*.spec.ts\""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "tsminilens": "^1.1.7"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^2.8.8",
+    "jasmine-ts": "^0.2.1",
+    "typescript": "^2.9.2"
+  }
+}
