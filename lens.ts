@@ -76,7 +76,9 @@ export class CastLens<T, TField, TField1 extends TField> extends Lens<T, TField1
     }
 
     over(obj: T, func: (val: TField1) => TField1): T {
-        return this.inner.over(obj, v => this.predicate(v) ? func(v) : v);
+        // over/set should allow acting on null, or null prevents set / override from happening
+        // because it won't satisfy the predicate 
+        return this.inner.over(obj, v => null == v || this.predicate(v) ? func(v as any) : v);
     }
 }
 

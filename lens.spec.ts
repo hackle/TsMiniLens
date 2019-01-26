@@ -5,8 +5,8 @@ interface Person { type: 'Person', name?: string; address: Address };
 interface Company { type: 'Company', title: string }
 interface House { owner: Person | Company };
 
-const isCompany = (c: Person | Company): c is Company => c.type === 'Company';
-const isPerson = (c:Person | Company): c is Person => c.type === 'Person';
+const isCompany = (c: Person | Company): c is Company => (c || <any>{}).type === 'Company';
+const isPerson = (c:Person | Company): c is Person => (c || <any>{}).type === 'Person';
 const duplicate = x => x + x;
 
 describe('Mini Lens for TypeScript', () => {
@@ -82,6 +82,14 @@ describe('Mini Lens for TypeScript', () => {
         it('can set', () => {
             const updated = lens4CompanyTitle.set({ owner: { title: 'title foo', type: 'Company' } }, 'title bar');
             expect(lens4CompanyTitle.view(updated)).toEqual('title bar');
+        });
+
+        it('can set on null value', () => {
+            const house: House = { owner: undefined };
+            const person: Person = { address: { street: 'queen' }, type: 'Person' };
+            
+            const withOwner = lensFrom<House>().to('owner').castIf(isPerson).set(house, person);
+            expect(withOwner).toEqual({ owner: person });
         });
         
         it('can not set incorrect variant', () => {
