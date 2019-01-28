@@ -6,6 +6,7 @@
   "types": "dist/lens.d.ts",
   "scripts": {
     "build": "tsc",
+    "publish": "tsc && npm publish",
     "test": "jasmine-ts \"./**/*.spec.ts\""
   },
   "repository": {
