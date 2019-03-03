@@ -67,4 +67,4 @@ It's also possible to chain lenses with ``lens1.chain(lens1)`` or more fluently,
 ``lens.castIf(typeGuard)`` supports navigating through union types safely with type guards.
 
 ## Remember it's mini
-Bear in mind it's mini indeed - there is no support for navigating through arrays, Maps or other complex data types.
+Bear in mind it's mini indeed - there is absolutely no parity with lens proper in Haskell.
