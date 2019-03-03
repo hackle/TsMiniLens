@@ -48,7 +48,7 @@ const updatedPerson = {
 // imagine more nesting! :(
 ```
 
-with ``set()`` this becomes a breeze
+with ``set()`` this becomes a breeze. It does a CoW (Copy on Write) to support immutability.
 ```
 const personRelocated = lensPerson2Street.set(person, 'new street');
 ```
