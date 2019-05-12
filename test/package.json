@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "tsminilens": "^1.1.7"
+    "tsminilens": "^1.1.8"
   },
   "devDependencies": {
     "@types/jasmine": "^2.8.8",
