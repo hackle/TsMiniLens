@@ -189,4 +189,21 @@ describe('Mini Lens for TypeScript', () => {
             expect(updated).toEqual(withoutCompany, 'object should not have changed even set fails');
         });
     });
+
+    describe('work with arrays', () => {
+        const l = lensFrom<string[]>().to(1);
+        const strings = [ 'aaa', 'bbb', 'ccc' ];
+
+        it('can view thru array', () => {
+            const oneChar = l.view(strings);
+
+            expect(oneChar).toEqual('bbb');
+        })
+
+        it('can set thru array', () => {
+            const actual = l.set(strings, 'zzz');
+
+            expect(actual).toEqual([ 'aaa', 'zzz', 'ccc' ]);
+        })
+    });
 });

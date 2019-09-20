@@ -68,5 +68,14 @@ It's also possible to chain lenses with ``lens1.chain(lens1)`` or more fluently,
 
 ``lens.castIf(typeGuard)`` supports navigating through union types safely with type guards.
 
+### arrays
+
+Operations on arrays are supported as arrays work similar to objects.
+
+```TypeScript
+lensFrom<string[]>().to(1).view([ 'aaa', 'bbb', 'ccc' ]);
+// 'bbb'
+```
+
 ## Remember it's mini
 Bear in mind it's mini indeed - there is absolutely no parity with lens proper in Haskell.

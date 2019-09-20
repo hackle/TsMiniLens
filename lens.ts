@@ -49,10 +49,14 @@ export class SimpleLens<T, TField> extends Lens<T, TField> {
     }
 
     over(obj: T, func: (val: TField) => TField): T {
+        const setArrayAware = (o, fld, val) => o instanceof Array
+            ? o.map((v, idx) => idx === fld ? val : v)
+            : { ...o, [fld]: val };
+
         return this.fields.reduceRight(
-            (st, cur) => next => mapNullable(_ => ({ ...next, [cur]: st(next[cur]) }), next),
+            (st, cur) => next => mapNullable(_ => setArrayAware(next, cur, st(next[cur])), next),
             func
-        )(obj);
+        )(obj as any);
     }
 }
 
