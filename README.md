@@ -64,7 +64,7 @@ Quiz: how to implement ``set()`` in terms of ``over()``?
 
 ### chain() and castIf()
 
-It's also possible to chain lenses with ``lens1.chain(lens1)`` or more fluently, ``lens.then.withPath('level1', 'level2')``
+It's also possible to chain lenses with ``lens1.chain(lens2)`` or more fluently, ``lens.then.withPath('level1', 'level2')``
 
 ``lens.castIf(typeGuard)`` supports navigating through union types safely with type guards.
 
