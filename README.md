@@ -4,7 +4,7 @@
 npm i tsminilens
 ```
 
-A type-safe and idiomatic way to navigate through nested JSON objects. Writtin in TypeScript so enjoy intellisense and compiler errors! (instead of null reference errors at run time).
+A type-safe and idiomatic way to navigate through nested JSON objects. Written in TypeScript so enjoy intellisense and compiler errors! (instead of null reference errors at run time).
 
 ![demo](./demo.gif)
 
