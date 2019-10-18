@@ -3,7 +3,7 @@ import { LensMaker, ChainedLensMaker, ChainedLensMakerAlias, LensMakerAlias } fr
 function mapNullable (f, n) { return n == null ? n : f(n); }
 
 export abstract class Lens<T, TField> {
-    set(obj: T, val: TField): T {
+    set<Tx extends T = T>(obj: Tx, val: TField): Tx {
         return this.over(obj, _ => val);
     }
 
@@ -30,7 +30,7 @@ export abstract class Lens<T, TField> {
     }
 
     abstract view(obj: T): TField;
-    abstract over(obj: T, func: (val: TField) => TField): T;
+    abstract over<Tx extends T = T>(obj: Tx, func: (val: TField) => TField): Tx;
 }
 
 export class SimpleLens<T, TField> extends Lens<T, TField> {
@@ -44,11 +44,11 @@ export class SimpleLens<T, TField> extends Lens<T, TField> {
         return this.fields.reduce((st, cur) => mapNullable(_ => st[cur], st), obj);
     }
 
-    set(obj: T, val: TField): T {
+    set<Tx extends T = T>(obj: Tx, val: TField): Tx {
         return this.over(obj, _ => val);
     }
 
-    over(obj: T, func: (val: TField) => TField): T {
+    over<Tx extends T = T>(obj: Tx, func: (val: TField) => TField): Tx {
         const setArrayAware = (o, fld, val) => o instanceof Array
             ? o.map((v, idx) => idx === fld ? val : v)
             : { ...o, [fld]: val };
@@ -75,11 +75,11 @@ export class CastLens<T, TField, TField1 extends TField> extends Lens<T, TField1
         );
     }
 
-    set(obj: T, val: TField1): T {
+    set<Tx extends T = T>(obj: Tx, val: TField1): Tx {
         return this.over(obj, _ => val);
     }
 
-    over(obj: T, func: (val: TField1) => TField1): T {
+    over<Tx extends T = T>(obj: Tx, func: (val: TField1) => TField1): Tx {
         // over/set should allow acting on null, or null prevents set / override from happening
         // because it won't satisfy the predicate 
         return this.inner.over(obj, v => null == v || this.predicate(v) ? func(v as any) : v);
@@ -98,11 +98,11 @@ export class ChainedLens<TRoot, TField, TField1> extends Lens<TRoot, TField1> {
         return mapNullable(v => this.inner2.view(v), this.inner1.view(obj));
     }
 
-    set(obj: TRoot, val: TField1): TRoot {
+    set<Tx extends TRoot = TRoot>(obj: Tx, val: TField1): Tx {
         return this.over(obj, _ => val);
     }
 
-    over(obj: TRoot, func: (val: TField1) => TField1): TRoot {
+    over<Tx extends TRoot = TRoot>(obj: Tx, func: (val: TField1) => TField1): Tx {
         return this.inner1.over(obj, fld => this.inner2.over(fld, func));
     }
 }

@@ -1,9 +1,10 @@
 import { lensFor, chain, lensFrom } from './lens';
 
-interface Address { city?: string; street: string; neighbor?: House };
-interface Person { type: 'Person', name?: string; address: Address };
+interface Address { city?: string; street: string; neighbor?: House }
+interface Person { type: 'Person', name?: string; address: Address }
+interface Student extends Person { school: string }
 interface Company { type: 'Company', title: string }
-interface House { owner: Person | Company };
+interface House { owner: Person | Company }
 
 const isCompany = (c: Person | Company): c is Company => (c || <any>{}).type === 'Company';
 const isPerson = (c:Person | Company): c is Person => (c || <any>{}).type === 'Person';
@@ -205,5 +206,13 @@ describe('Mini Lens for TypeScript', () => {
 
             expect(actual).toEqual([ 'aaa', 'zzz', 'ccc' ]);
         })
+    });
+
+    describe('works with extended types', () => {
+        const lStudentToName = lensFrom<Person>().to('name');
+        const student : Student = { 'address': null, 'school': 'Snakebite', 'type': 'Person' };
+
+        // this should compile
+        const withNewName: Student = lStudentToName.set(student, 'Jan');
     });
 });
