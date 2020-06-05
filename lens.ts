@@ -2,7 +2,7 @@ import { LensMaker, ChainedLensMaker, ChainedLensMakerAlias, LensMakerAlias } fr
 
 function mapNullable (f, n) { return n == null ? n : f(n); }
 
-export abstract class Lens<T, TField> {
+export abstract class Lens<T, TField, TView = TField> {
     set<Tx extends T = T>(obj: Tx, val: TField): Tx {
         return this.over(obj, _ => val);
     }
@@ -29,7 +29,7 @@ export abstract class Lens<T, TField> {
         };
     }
 
-    abstract view(obj: T): TField;
+    abstract view(obj: T): TView;
     abstract over<Tx extends T = T>(obj: Tx, func: (val: TField) => TField): Tx;
 }
 
@@ -107,6 +107,24 @@ export class ChainedLens<TRoot, TField, TField1> extends Lens<TRoot, TField1> {
     }
 }
 
+export class ArrayLens<TRoot, TField> extends Lens<TRoot[], TField, TField[]> {
+    constructor(
+        private inner: Lens<TRoot, TField>
+    ) { super(); }
+
+    view(obj: TRoot[]): TField[] {
+        return obj.map(this.inner.view);
+    }
+
+    set<Tx extends TRoot = TRoot>(obj: Tx[], val: TField): Tx[] {
+        return this.over(obj, _ => val);
+    }
+
+    over<Tx extends TRoot = TRoot>(obj: Tx[], func: (val: TField) => TField): Tx[] {
+        return obj.map(fld => this.inner.over(fld, func));
+    }
+}
+
 export function chain<T, TField, TField1>(
         lens1: Lens<T, TField>,
         lens2: Lens<TField, TField1>
@@ -114,9 +132,24 @@ export function chain<T, TField, TField1>(
     return new ChainedLens(lens1, lens2);
 }
 
+function makeLens(fields: string[]) {
+    if (fields.length == 0) return new SimpleLens(fields);
+
+    // when '[]' appears, it means drilling down to an array
+    const [ groups, cache ] = fields.reduce(
+        ([g, c], cur) => cur == '[]' ? [[...g, c], []] : [g, [...c, cur]],
+        [[], []]
+    );
+
+    return [...groups, cache]
+            .filter(xs => xs.length > 0)
+            .map(fs => new SimpleLens(fs))
+            .reduce((l1, l2) => l1.chain(l2));
+}
+
 export function lensFor<T>(): LensMaker<T> {
     return <any>{
-        withPath(...ps: string[]) { return new SimpleLens(ps); }
+        withPath(...ps: string[]) { return makeLens(ps); }
     };
 }
 

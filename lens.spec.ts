@@ -191,7 +191,7 @@ describe('Mini Lens for TypeScript', () => {
         });
     });
 
-    describe('work with arrays', () => {
+    describe('work with arrays via indexing', () => {
         const l = lensFrom<string[]>().to(1);
         const strings = [ 'aaa', 'bbb', 'ccc' ];
 
@@ -205,6 +205,29 @@ describe('Mini Lens for TypeScript', () => {
             const actual = l.set(strings, 'zzz');
 
             expect(actual).toEqual([ 'aaa', 'zzz', 'ccc' ]);
+        })
+    });
+
+    describe('work with arrays via elements', () => {
+        const l = lensFrom<string[][]>().to('[]', '[]');
+        const strings = [ [ 'aaa', 'bbb', 'ccc' ] ];
+
+        it('can view thru array', () => {
+            const oneChar = l.view(strings);
+
+            expect(oneChar).toEqual(strings);
+        })
+
+        it('can set thru array', () => {
+            const actual = l.set(strings, 'zzz');
+
+            expect(actual).toEqual([ 'zzz', 'zzz', 'zzz' ]);
+        })
+
+        it('can over thru array', () => {
+            const actual = l.over(strings, s => s + 'z');
+
+            expect(actual).toEqual([ 'aaaz', 'bbbz', 'cccz' ]);
         })
     });
 

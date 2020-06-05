@@ -1,30 +1,41 @@
 import { Lens } from "./lens";
 
+// key of
+type K<T> = T extends Array<infer U> ? keyof T | '[]' : keyof T;
+
+// field of
+type F<T, K> = K extends keyof T ? T[K] : never;
+
+// element of
+type E<T, I extends K<T>> = T extends Array<infer U> ? 
+                                        I extends '[]' ? U : F<T, I> : 
+                                    F<T, I>;
+
 export type ChainedLensMaker<TFrom, T> = {
     withPath(): Lens<TFrom, T>;
     withPath<
-        P1 extends keyof T
+        P1 extends K<T>
         >(
             p1: P1
-        ): Lens<TFrom, T[P1]>;
+        ): Lens<TFrom, E<T, P1>>;
 
     withPath<
-        P1 extends keyof T, 
-        P2 extends keyof T[P1]
+        P1 extends K<T>, 
+        P2 extends K<E<T, P1>>
         >(
             p1: P1, 
             p2: P2
-        ): Lens<TFrom, T[P1][P2]>;
+        ): Lens<TFrom, E<E<T, P1>, P2>>;
     
     withPath<
-        P1 extends keyof T, 
-        P2 extends keyof T[P1],
-        P3 extends keyof T[P1][P2]
+        P1 extends K<T>, 
+        P2 extends K<E<T, P1>>,
+        P3 extends K<E<E<T, P1>, P2>>
         >(
             p1: P1, 
             p2: P2,
             p3: P3
-        ): Lens<TFrom, T[P1][P2][P3]>;
+        ): Lens<TFrom, E<E<E<T, P1>, P2>, P3>>;
     
     withPath<
         P1 extends keyof T, 
