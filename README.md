@@ -77,5 +77,11 @@ lensFrom<string[]>().to(1).view([ 'aaa', 'bbb', 'ccc' ]);
 // 'bbb'
 ```
 
+## Caveats
+
+Copy-on-write is implemented with the spread operator, e.g. `{ ...foo, bar: baz }`. This works for plain objects and arrays, but is not safe for complex types such as Map, Set, or class etc.
+
+There are friendly requests to add support for view / set of array elements. The challenge is to not to disrupt the current interfaces too much so it will be work in progress for a (long) while.
+
 ## Remember it's mini
 Bear in mind it's mini indeed - there is absolutely no parity with lens proper in Haskell.
