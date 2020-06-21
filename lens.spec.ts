@@ -8,6 +8,8 @@ interface House { owner: Person | Company }
 
 const isCompany = (c: Person | Company): c is Company => (c || <any>{}).type === 'Company';
 const isPerson = (c:Person | Company): c is Person => (c || <any>{}).type === 'Person';
+const isString = o => typeof o == 'string';
+const isNumber = o => typeof o == 'number';
 const duplicate = x => x + x;
 
 describe('Mini Lens for TypeScript', () => {
@@ -214,5 +216,34 @@ describe('Mini Lens for TypeScript', () => {
 
         // this should compile
         const withNewName: Student = lStudentToName.set(student, 'Jan');
+    });
+
+    describe('works through array', () => {
+        const foo = { bar: [ { name: 'Alice' }, { name: 'Bob' } ]};
+        const lNames = lensFrom<typeof foo>().to('bar').map('name');
+
+        it('can view', () => {
+            expect(lNames.view(foo)).toEqual([ 'Alice', 'Bob']);
+        });
+
+        [
+            {
+                in: foo, out: { bar: [ { name: 'Cindy' }, { name: 'Cindy' } ]}
+            },
+            {
+                in: null, out: null
+            }
+        ].forEach(testcase => it(`can set, ${JSON.stringify(testcase)}`, () => {
+            expect(lNames.set(testcase.in as any, 'Cindy')).toEqual(testcase.out as any);
+        }));
+
+        // it('can cast', () => {
+        //     expect(lNames.castIf(isString).view(foo)).toEqual([ 'Alice', 'Bob' ]);
+        //     expect(lNames.castIf(isNumber).view(foo)).toEqual([]);
+        // });
+
+        // it('can chain', () => {
+        //     expect(lNames.castIf(isString).chain('length').view(foo)).toEqual([ 5, 3 ]);
+        // });
     });
 });

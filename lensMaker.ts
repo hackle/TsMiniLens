@@ -1,12 +1,14 @@
-import { Lens } from "./lens";
+import { Lens, Mapped } from "./lens";
 
-export type ChainedLensMaker<TFrom, T> = {
-    withPath(): Lens<TFrom, T>;
+type LensOrMapped<TFrom, T, T1, IsArray extends boolean> = IsArray extends false ? Lens<TFrom, T1> : Mapped<TFrom, T, T1>;
+
+export type ChainedLensMaker<TFrom, T, IsArray extends boolean = false> = {
+    withPath(): LensOrMapped<TFrom, T, T, IsArray>;
     withPath<
         P1 extends keyof T
         >(
             p1: P1
-        ): Lens<TFrom, T[P1]>;
+        ): LensOrMapped<TFrom, T, T[P1], IsArray>;
 
     withPath<
         P1 extends keyof T, 
@@ -14,7 +16,7 @@ export type ChainedLensMaker<TFrom, T> = {
         >(
             p1: P1, 
             p2: P2
-        ): Lens<TFrom, T[P1][P2]>;
+        ): LensOrMapped<TFrom, T, T[P1][P2], IsArray>;
     
     withPath<
         P1 extends keyof T, 
@@ -24,7 +26,7 @@ export type ChainedLensMaker<TFrom, T> = {
             p1: P1, 
             p2: P2,
             p3: P3
-        ): Lens<TFrom, T[P1][P2][P3]>;
+        ): LensOrMapped<TFrom, T, T[P1][P2][P3], IsArray>;
     
     withPath<
         P1 extends keyof T, 
@@ -36,7 +38,7 @@ export type ChainedLensMaker<TFrom, T> = {
             p2: P2,
             p3: P3,
             p4: P4
-        ): Lens<TFrom, T[P1][P2][P3][P4]>;
+        ): LensOrMapped<TFrom, T, T[P1][P2][P3][P4], IsArray>;
     
     withPath<
         P1 extends keyof T, 
@@ -50,7 +52,7 @@ export type ChainedLensMaker<TFrom, T> = {
             p3: P3,
             p4: P4,
             p5: P5
-        ): Lens<TFrom, T[P1][P2][P3][P4][P5]>;
+        ): LensOrMapped<TFrom, T, T[P1][P2][P3][P4][P5], IsArray>;
     
     withPath<
         P1 extends keyof T, 
@@ -66,7 +68,7 @@ export type ChainedLensMaker<TFrom, T> = {
             p4: P4,
             p5: P5,
             p6: P6
-        ): Lens<TFrom, T[P1][P2][P3][P4][P5][P6]>;
+        ): LensOrMapped<TFrom, T, T[P1][P2][P3][P4][P5][P6], IsArray>;
     
     withPath<
         P1 extends keyof T, 
@@ -84,7 +86,7 @@ export type ChainedLensMaker<TFrom, T> = {
             p5: P5,
             p6: P6,
             p7: P7
-        ): Lens<TFrom, T[P1][P2][P3][P4][P5][P6][P7]>;
+        ): LensOrMapped<TFrom, T, T[P1][P2][P3][P4][P5][P6][P7], IsArray>;
     
     withPath<
         P1 extends keyof T, 
@@ -104,7 +106,7 @@ export type ChainedLensMaker<TFrom, T> = {
             p6: P6,
             p7: P7,
             p8: P8,
-        ): Lens<TFrom, T[P1][P2][P3][P4][P5][P6][P7][P8]>;
+        ): LensOrMapped<TFrom, T, T[P1][P2][P3][P4][P5][P6][P7][P8], IsArray>;
     
     withPath<
         P1 extends keyof T, 
@@ -126,10 +128,11 @@ export type ChainedLensMaker<TFrom, T> = {
             p7: P7,
             p8: P8,
             p9: P9,
-        ): Lens<TFrom, T[P1][P2][P3][P4][P5][P6][P7][P8][P9]>;
+        ): LensOrMapped<TFrom, T, T[P1][P2][P3][P4][P5][P6][P7][P8][P9], IsArray>;
 };
 
 export type LensMaker<T> = ChainedLensMaker<T, T>;
 
 export type ChainedLensMakerAlias<T1, T2> = { to: ChainedLensMaker<T1, T2>['withPath'] };
 export type LensMakerAlias<T> = ChainedLensMakerAlias<T, T>;
+export type PathMaker<T, T1, IsArray extends boolean> = ChainedLensMaker<T, T1, IsArray>['withPath'];

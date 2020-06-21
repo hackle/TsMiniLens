@@ -1,4 +1,4 @@
-import { LensMaker, ChainedLensMaker, ChainedLensMakerAlias, LensMakerAlias } from "./lensMaker";
+import { LensMaker, ChainedLensMaker, PathMaker, ChainedLensMakerAlias, LensMakerAlias } from "./lensMaker";
 
 function mapNullable (f, n) { return n == null ? n : f(n); }
 
@@ -31,6 +31,10 @@ export abstract class Lens<T, TField> {
 
     abstract view(obj: T): TField;
     abstract over<Tx extends T = T>(obj: Tx, func: (val: TField) => TField): Tx;
+
+    get map(): TField extends Array<infer E> ? PathMaker<T, E, true> : never {
+        return <any>((...ps: string[]) => new Mapped(this as any, new SimpleLens(ps)));
+    }
 }
 
 export class SimpleLens<T, TField> extends Lens<T, TField> {
@@ -130,4 +134,23 @@ export function castIf<T, TField, TField1 extends TField>(
     predicate: (o: TField) => o is TField1
 ): Lens<T, TField1> {
     return new CastLens<T, TField, TField1>(lens, predicate);
+}
+
+export class Mapped<TRoot, TEle, T1> {
+    constructor(
+        private parentLens: Lens<TRoot, TEle[]>,
+        private elementLens: Lens<TEle, T1>
+    ) { }
+
+    view(obj: TRoot): T1[] {
+        return (this.parentLens.view(obj) || []).map(e => this.elementLens.view(e)) as any;
+    }
+
+    over<Tx extends TRoot = TRoot>(obj: Tx, func: (val: T1) => T1): TRoot {
+        return this.parentLens.over(obj, v => !v ? v : v.map(e => this.elementLens.over(e, func))) as any;
+    }
+
+    set<Tx extends TRoot = TRoot>(obj: Tx, val: T1): TRoot {
+        return this.over(obj, _ => val);
+    }
 }
