@@ -8,8 +8,9 @@ interface House { owner: Person | Company }
 
 const isCompany = (c: Person | Company): c is Company => (c || <any>{}).type === 'Company';
 const isPerson = (c:Person | Company): c is Person => (c || <any>{}).type === 'Person';
-const isString = o => typeof o == 'string';
-const isNumber = o => typeof o == 'number';
+
+function isString(o): o is string { return typeof o == 'string'; }
+function isNumber(o): o is number { return typeof o == 'number'; }
 const duplicate = x => x + x;
 
 describe('Mini Lens for TypeScript', () => {
@@ -237,10 +238,9 @@ describe('Mini Lens for TypeScript', () => {
             expect(lNames.set(testcase.in as any, 'Cindy')).toEqual(testcase.out as any);
         }));
 
-        // it('can cast', () => {
-        //     expect(lNames.castIf(isString).view(foo)).toEqual([ 'Alice', 'Bob' ]);
-        //     expect(lNames.castIf(isNumber).view(foo)).toEqual([]);
-        // });
+        it('can cast', () => {
+            expect(lNames.castIf(isString).view(foo)).toEqual([ 'Alice', 'Bob' ]);
+        });
 
         // it('can chain', () => {
         //     expect(lNames.castIf(isString).chain('length').view(foo)).toEqual([ 5, 3 ]);

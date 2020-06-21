@@ -153,4 +153,10 @@ export class Mapped<TRoot, TEle, T1> {
     set<Tx extends TRoot = TRoot>(obj: Tx, val: T1): TRoot {
         return this.over(obj, _ => val);
     }
+
+    castIf<T2 extends T1>(
+        predicate: (o: T1) => o is T2
+    ): Mapped<TRoot, TEle, T2> {
+        return new Mapped(this.parentLens, castIf(this.elementLens, predicate));
+    }
 }
