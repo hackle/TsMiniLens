@@ -220,7 +220,18 @@ describe('Mini Lens for TypeScript', () => {
     });
 
     describe('works through array', () => {
-        const foo = { bar: [ { name: 'Alice' }, { name: 'Bob' } ]};
+        const foo = { 
+            bar: [
+                {
+                    name: 'Alice', 
+                    family: [ { name: 'Anna' }, { name: 'Anil' } ] 
+                }, 
+                {
+                    name: 'Bob', 
+                    family: [ { name: 'Bart' }, { name: 'Bill' } ] 
+                } 
+            ]
+        };
         const lNames = lensFrom<typeof foo>().to('bar').map('name');
 
         it('can view', () => {
@@ -229,7 +240,7 @@ describe('Mini Lens for TypeScript', () => {
 
         [
             {
-                in: foo, out: { bar: [ { name: 'Cindy' }, { name: 'Cindy' } ]}
+                in: { bar: [ { name: 'Cindy' }, { name: 'Cindy' } ]}, out: { bar: [ { name: 'Cindy' }, { name: 'Cindy' } ]}
             },
             {
                 in: null, out: null
@@ -242,8 +253,8 @@ describe('Mini Lens for TypeScript', () => {
             expect(lNames.castIf(isString).view(foo)).toEqual([ 'Alice', 'Bob' ]);
         });
 
-        // it('can chain', () => {
-        //     expect(lNames.castIf(isString).chain('length').view(foo)).toEqual([ 5, 3 ]);
-        // });
+        it('can map again', () => {
+            expect(lensFrom<typeof foo>().to('bar').map('family').map('name').view(foo)).toEqual([ 'Anil', 'Bill' ] as any);
+        });
     });
 });
