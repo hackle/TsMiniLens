@@ -15,14 +15,15 @@ A type-safe and idiomatic way to navigate through nested JSON objects. Written i
 interface Address { city?: string; street: string };
 interface Person { name?: string; address: Address };
 
-const lensPerson2Street = lensFor<Person>().withPath('address', 'street'); // this is type safe, e.g. 'street1' wont't compile
-
-// or since version 1.1.6
 const lensPerson2Street = lensFrom<Person>().to('address', 'street');
 
+// since 1.1.13
+const lensPerson2Street = L<Person>().to('address', 'street');
 ```
 
 ### view() to navigate safely
+
+UPDATE: for viewing only, [optional chaining](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining) would be a better solution. Lens is more useful for updating / modifying data, see below.
 
 We all know the dreaded null reference exception (Law of demeter applies)
 
