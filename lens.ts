@@ -125,6 +125,9 @@ export function lensFrom<T>(): LensMakerAlias<T> {
     return { to: lensFor<T>().withPath };
 }
 
+// an even terser alias
+export function L<T>(): LensMakerAlias<T> { return lensFrom<T>(); }
+
 export function castIf<T, TField, TField1 extends TField>(
     lens: Lens<T, TField>, 
     predicate: (o: TField) => o is TField1
