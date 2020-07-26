@@ -67,7 +67,7 @@ Quiz: how to implement ``set()`` in terms of ``over()``?
 
 It's also possible to chain lenses with ``lens1.chain(lens2)`` or more fluently, ``lens1.then.to('level1', 'level2')``
 
-``lens.castIf(typeGuard)`` supports navigating through union types safely with type guards.
+``lens.castIf(typeGuard)`` supports navigating through union types safely with [type guards](https://www.typescriptlang.org/docs/handbook/advanced-types.html#type-guards-and-differentiating-types).
 
 ### arrays
 
