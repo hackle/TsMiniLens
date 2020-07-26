@@ -1,4 +1,4 @@
-import { lensFor, lensFrom } from "../lens";
+import { lensFor, lensFrom, L } from "../lens";
 
 interface Address { city?: string; street: string; neighbor?: House };
 interface Person { type: 'Person', name?: string; address: Address };
@@ -11,7 +11,7 @@ const duplicate = x => x + x;
 
 describe('Mini Lens for TypeScript', () => {
     describe('Dumb, no path', () => {
-        const dumbLens = lensFor<string>().withPath();
+        const dumbLens = L<string>().to();
 
         it('can view', () => {
             expect(dumbLens.view('foo')).toEqual('foo');
@@ -27,7 +27,7 @@ describe('Mini Lens for TypeScript', () => {
     });
 
     describe('Through nested objects', () => {
-        const lensPerson2Street = lensFor<Person>().withPath('address', 'street');
+        const lensPerson2Street = L<Person>().to('address', 'street');
 
         it('can view', () => {
             expect(lensPerson2Street.view({ address: { street: 'foo' }, type: 'Person' })).toEqual('foo');
@@ -67,9 +67,9 @@ describe('Mini Lens for TypeScript', () => {
     });
 
     describe('chain lens / cast through union type', () => {
-        const lens4CompanyTitle = lensFor<House>().withPath('owner')
+        const lens4CompanyTitle = L<House>().to('owner')
             .castIf<Company>(isCompany)
-            .chain(lensFor<Company>().withPath('title'));
+            .chain(L<Company>().to('title'));
 
         it('can view', () => {            
             expect(lens4CompanyTitle.view({ owner: { title: 'title foo', type: 'Company' } })).toEqual('title foo');
@@ -101,9 +101,9 @@ describe('Mini Lens for TypeScript', () => {
     });
 
     describe('chain and cast galore', () => {
-        const lensGalore = lensFor<House>().withPath('owner').castIf(isPerson)
-            .chain(lensFor<Person>().withPath('address', 'neighbor', 'owner').castIf(isCompany))
-            .chain(lensFor<Company>().withPath('title'));
+        const lensGalore = L<House>().to('owner').castIf(isPerson)
+            .chain(L<Person>().to('address', 'neighbor', 'owner').castIf(isCompany))
+            .chain(L<Company>().to('title'));
 
         it('with valid data', () => {
             const nested: House = {
@@ -139,9 +139,9 @@ describe('Mini Lens for TypeScript', () => {
     });
 
     describe('chain with path', () => {
-        const lens4CompanyTitle = lensFor<House>().withPath('owner')
+        const lens4CompanyTitle = L<House>().to('owner')
             .castIf<Company>(isCompany)
-            .then.withPath('title');
+            .then.to('title');
 
         it('can view', () => {            
             expect(lens4CompanyTitle.view({ owner: { title: 'title foo', type: 'Company' } })).toEqual('title foo');

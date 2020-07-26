@@ -17,7 +17,7 @@ interface Person { name?: string; address: Address };
 
 const lensPerson2Street = lensFrom<Person>().to('address', 'street');
 
-// since 1.1.13
+// since 1.1.16
 const lensPerson2Street = L<Person>().to('address', 'street');
 ```
 
