@@ -1,12 +1,10 @@
-import { lensFor, lensFrom, L } from "../lens";
+import { lensFrom, L } from "../lens";
 
 interface Address { city?: string; street: string; neighbor?: House };
 interface Person { type: 'Person', name?: string; address: Address };
 interface Company { type: 'Company', title: string }
 interface House { owner: Person | Company };
 
-const isCompany = (c: Person | Company): c is Company => (c || <any>{}).type === 'Company';
-const isPerson = (c:Person | Company): c is Person => (c || <any>{}).type === 'Person';
 const duplicate = x => x + x;
 
 describe('Mini Lens for TypeScript', () => {
@@ -27,7 +25,7 @@ describe('Mini Lens for TypeScript', () => {
     });
 
     describe('Through nested objects', () => {
-        const lensPerson2Street = L<Person>().to('address', 'street');
+        const lensPerson2Street = L<Person>().to('address', 'city');
 
         it('can view', () => {
             expect(lensPerson2Street.view({ address: { street: 'foo' }, type: 'Person' })).toEqual('foo');
@@ -68,7 +66,6 @@ describe('Mini Lens for TypeScript', () => {
 
     describe('chain lens / cast through union type', () => {
         const lens4CompanyTitle = L<House>().to('owner')
-            .castIf<Company>(isCompany)
             .chain(L<Company>().to('title'));
 
         it('can view', () => {            
@@ -88,7 +85,7 @@ describe('Mini Lens for TypeScript', () => {
             const house: House = { owner: undefined };
             const person: Person = { address: { street: 'queen' }, type: 'Person' };
             
-            const withOwner = lensFrom<House>().to('owner').castIf(isPerson).set(house, person);
+            const withOwner = lensFrom<House>().to('owner').set(house, person);
             expect(withOwner).toEqual({ owner: person });
         });
         
@@ -96,13 +93,13 @@ describe('Mini Lens for TypeScript', () => {
             const notACompany = { name: 'foo', address: null, type: 'Person' };
             const withoutCompany = { owner: <any>notACompany };
             const updated = lens4CompanyTitle.set(withoutCompany, 'title bar');
-            expect(updated).toEqual(withoutCompany, 'object should not have changed even set fails');
+            expect(updated).toEqual(withoutCompany);
         });
     });
 
     describe('chain and cast galore', () => {
-        const lensGalore = L<House>().to('owner').castIf(isPerson)
-            .chain(L<Person>().to('address', 'neighbor', 'owner').castIf(isCompany))
+        const lensGalore = L<House>().to('owner')
+            .chain(L<Person>().to('address', 'neighbor', 'owner'))
             .chain(L<Company>().to('title'));
 
         it('with valid data', () => {
@@ -120,8 +117,8 @@ describe('Mini Lens for TypeScript', () => {
                     }
                 }
             };
-            expect(lensGalore.view(nested)).toEqual('bar', 'view fails');
-            expect(lensGalore.view(lensGalore.set(nested, 'bar'))).toEqual('bar', 'set fails');
+            expect(lensGalore.view(nested)).toEqual('bar');
+            expect(lensGalore.view(lensGalore.set(nested, 'bar'))).toEqual('bar');
         });
 
         it('with invalid data', () => {
@@ -133,15 +130,13 @@ describe('Mini Lens for TypeScript', () => {
                     }
                 }
             };
-            expect(lensGalore.view(nested)).toBeUndefined('view fails');
-            expect(lensGalore.view(lensGalore.set(nested, 'bar'))).toBeUndefined('set fails');
+            expect(lensGalore.view(nested)).toBeUndefined();
+            expect(lensGalore.view(lensGalore.set(nested, 'bar'))).toBeUndefined();
         });
     });
 
     describe('chain with path', () => {
-        const lens4CompanyTitle = L<House>().to('owner')
-            .castIf<Company>(isCompany)
-            .then.to('title');
+        const lens4CompanyTitle = L<House>().to('owner', 'title');
 
         it('can view', () => {            
             expect(lens4CompanyTitle.view({ owner: { title: 'title foo', type: 'Company' } })).toEqual('title foo');
@@ -160,14 +155,12 @@ describe('Mini Lens for TypeScript', () => {
             const notACompany = { name: 'foo', address: null, type: 'Person' };
             const withoutCompany = { owner: <any>notACompany };
             const updated = lens4CompanyTitle.set(withoutCompany, 'title bar');
-            expect(updated).toEqual(withoutCompany, 'object should not have changed even set fails');
+            expect(updated).toEqual(withoutCompany);
         });
     });
 
     describe('chain with path -- aliased', () => {
-        const lens4CompanyTitle = lensFrom<House>().to('owner')
-            .castIf<Company>(isCompany)
-            .then.to('title');
+        const lens4CompanyTitle = lensFrom<House>().to('owner', 'title');
 
         it('can view', () => {            
             expect(lens4CompanyTitle.view({ owner: { title: 'title foo', type: 'Company' } })).toEqual('title foo');
@@ -186,7 +179,7 @@ describe('Mini Lens for TypeScript', () => {
             const notACompany = { name: 'foo', address: null, type: 'Person' };
             const withoutCompany = { owner: <any>notACompany };
             const updated = lens4CompanyTitle.set(withoutCompany, 'title bar');
-            expect(updated).toEqual(withoutCompany, 'object should not have changed even set fails');
+            expect(updated).toEqual(withoutCompany);
         });
     });
 });

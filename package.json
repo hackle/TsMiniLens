@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "publish": "tsc && npm publish",
-    "test": "jasmine-ts \"./**/*.spec.ts\""
+    "test": "ts-jest"
   },
   "repository": {
     "type": "git",
@@ -23,9 +23,11 @@
     "url": "https://github.com/hackle/TsMiniLens/issues"
   },
   "homepage": "https://github.com/hackle/TsMiniLens#readme",
+  "peerDependencies": {
+    "typescript": "^4.6.3"
+  },
   "devDependencies": {
-    "@types/jasmine": "^2.8.8",
-    "jasmine-ts": "^0.2.1",
-    "typescript": "^2.9.2"
+    "@types/jest": "^27.4.1",
+    "ts-jest": "^27.1.4"
   }
 }

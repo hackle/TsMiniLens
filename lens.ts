@@ -1,4 +1,4 @@
-import { LensMaker, ChainedLensMaker, ChainedLensMakerAlias, LensMakerAlias } from "./lensMaker";
+import { ChainedLensMaker, ChainedLensMakerAlias, LensMaker, LensMakerAlias } from "./lensMaker";
 
 function mapNullable (f, n) { return n == null ? n : f(n); }
 
@@ -13,22 +13,23 @@ export abstract class Lens<T, TField> {
         return castIf(this, predicate);
     }
 
-    chain<TField1>(
-        lens1: Lens<TField, TField1>
+    chain<TField1, TFieldComp extends TField = TField>(
+        lens1: Lens<TFieldComp, TField1>
     ): Lens<T, TField1> {
-        return chain(this, lens1);
+        return chain(this, lens1) as any;
     }
-
+    
     /*
     chain lenses in a slightly more fluent way than chain()
     */
     get then(): ChainedLensMaker<T, TField> & ChainedLensMakerAlias<T, TField> {
-      return <any>{
-            withPath: (...ps: string[]) => chain(this, new SimpleLens(ps)),
-            to: (...ps: string[]) => chain(this, new SimpleLens(ps)),
-        };
-    }
-
+        return <any>{
+              withPath: (...ps: string[]) => chain(this, new SimpleLens(ps) as any),
+              to: (...ps: string[]) => chain(this, new SimpleLens(ps) as any),
+          };
+      }
+  
+  
     abstract view(obj: T): TField;
     abstract over<Tx extends T = T>(obj: Tx, func: (val: TField) => TField): Tx;
 }
@@ -48,7 +49,7 @@ export class SimpleLens<T, TField> extends Lens<T, TField> {
         return this.over(obj, _ => val);
     }
 
-    over<Tx extends T = T>(obj: Tx, func: (val: TField) => TField): Tx {
+    over<Tx extends T = T>(obj: Tx,  func: (val: TField) => TField): Tx {
         const setArrayAware = (o, fld, val) => o instanceof Array
             ? o.map((v, idx) => idx === fld ? val : v)
             : { ...o, [fld]: val };
@@ -86,10 +87,17 @@ export class CastLens<T, TField, TField1 extends TField> extends Lens<T, TField1
     }
 }
 
-export class ChainedLens<TRoot, TField, TField1> extends Lens<TRoot, TField1> {
+export function castIf<T, TField, TField1 extends TField>(
+    lens: Lens<T, TField>, 
+    predicate: (o: TField) => o is TField1
+): Lens<T, TField1> {
+    return new CastLens<T, TField, TField1>(lens, predicate);
+}
+
+export class ChainedLens<TRoot, TField, TField1, TFieldComp extends TField = TField> extends Lens<TRoot, TField1> {
     constructor (
         private inner1: Lens<TRoot, TField>,
-        private inner2: Lens<TField, TField1>
+        private inner2: Lens<TFieldComp, TField1>
     ) { 
         super();
     }
@@ -103,14 +111,14 @@ export class ChainedLens<TRoot, TField, TField1> extends Lens<TRoot, TField1> {
     }
 
     over<Tx extends TRoot = TRoot>(obj: Tx, func: (val: TField1) => TField1): Tx {
-        return this.inner1.over(obj, fld => this.inner2.over(fld, func));
+        return this.inner1.over(obj, (fld: TFieldComp) => this.inner2.over(fld, func));
     }
 }
 
-export function chain<T, TField, TField1>(
+export function chain<T, TField, TField1, TFieldComp extends TField = TField>(
         lens1: Lens<T, TField>,
-        lens2: Lens<TField, TField1>
-): ChainedLens<T, TField, TField1> {
+        lens2: Lens<TFieldComp, TField1>
+): ChainedLens<T, TField, TField1, TFieldComp> {
     return new ChainedLens(lens1, lens2);
 }
 
@@ -127,10 +135,3 @@ export function lensFrom<T>(): LensMakerAlias<T> {
 
 // an even terser alias
 export function L<T>(): LensMakerAlias<T> { return lensFrom<T>(); }
-
-export function castIf<T, TField, TField1 extends TField>(
-    lens: Lens<T, TField>, 
-    predicate: (o: TField) => o is TField1
-): Lens<T, TField1> {
-    return new CastLens<T, TField, TField1>(lens, predicate);
-}

@@ -97,7 +97,7 @@ describe('Mini Lens for TypeScript', () => {
             const notACompany = { name: 'foo', address: null, type: 'Person' };
             const withoutCompany = { owner: <any>notACompany };
             const updated = lens4CompanyTitle.set(withoutCompany, 'title bar');
-            expect(updated).toEqual(withoutCompany, 'object should not have changed even set fails');
+            expect(updated).toEqual(withoutCompany);
         });
     });
 
@@ -121,8 +121,8 @@ describe('Mini Lens for TypeScript', () => {
                     }
                 }
             };
-            expect(lensGalore.view(nested)).toEqual('bar', 'view fails');
-            expect(lensGalore.view(lensGalore.set(nested, 'bar'))).toEqual('bar', 'set fails');
+            expect(lensGalore.view(nested)).toEqual('bar');
+            expect(lensGalore.view(lensGalore.set(nested, 'bar'))).toEqual('bar');
         });
 
         it('with invalid data', () => {
@@ -134,8 +134,8 @@ describe('Mini Lens for TypeScript', () => {
                     }
                 }
             };
-            expect(lensGalore.view(nested)).toBeUndefined('view fails');
-            expect(lensGalore.view(lensGalore.set(nested, 'bar'))).toBeUndefined('set fails');
+            expect(lensGalore.view(nested)).toBeUndefined();
+            expect(lensGalore.view(lensGalore.set(nested, 'bar'))).toBeUndefined();
         });
     });
 
@@ -161,7 +161,7 @@ describe('Mini Lens for TypeScript', () => {
             const notACompany = { name: 'foo', address: null, type: 'Person' };
             const withoutCompany = { owner: <any>notACompany };
             const updated = lens4CompanyTitle.set(withoutCompany, 'title bar');
-            expect(updated).toEqual(withoutCompany, 'object should not have changed even set fails');
+            expect(updated).toEqual(withoutCompany);
         });
     });
 
@@ -187,7 +187,7 @@ describe('Mini Lens for TypeScript', () => {
             const notACompany = { name: 'foo', address: null, type: 'Person' };
             const withoutCompany = { owner: <any>notACompany };
             const updated = lens4CompanyTitle.set(withoutCompany, 'title bar');
-            expect(updated).toEqual(withoutCompany, 'object should not have changed even set fails');
+            expect(updated).toEqual(withoutCompany);
         });
     });
 
