@@ -8,6 +8,29 @@ A type-safe and idiomatic way to navigate through nested JSON objects. Written i
 
 ![demo](./demo.gif)
 
+## Releases
+### 2.0.1
+
+This release adds automatic selection from union types.
+
+Consider,
+
+```TypeScript
+type T1 = { kind: 't1', foo: string };
+type T2 = { kind: 't2', bar: number };
+type U = { element: T1|T2 };
+
+// I want to dot into the fields of T1 or T2 directly
+// this used to fail but will now work
+const l = L<U>().to('element', 'foo');
+```
+
+The library is able to detect that field name `foo` identifies the type of `element` to be `T1`.
+
+Previously this requires a type guard e.g. `L<U>().to('element').castIf(isT1)`.
+
+`castIf` should now be obsolete, although it's kept for backward compatibility.
+
 ## Use cases
 
 ### Given

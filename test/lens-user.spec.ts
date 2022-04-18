@@ -1,10 +1,13 @@
-import { lensFrom, L } from "../lens";
+import { L } from 'tsminilens';
 
-interface Address { city?: string; street: string; neighbor?: House };
-interface Person { type: 'Person', name?: string; address: Address };
+interface Address { city?: string; street: string; neighbor?: House }
+interface Person { type: 'Person', name?: string; address: Address }
+interface Student extends Person { school: string }
 interface Company { type: 'Company', title: string }
-interface House { owner: Person | Company };
+interface House { owner: Person | Company }
 
+const isCompany = (c: Person | Company): c is Company => (c || <any>{}).type === 'Company';
+const isPerson = (c:Person | Company): c is Person => (c || <any>{}).type === 'Person';
 const duplicate = x => x + x;
 
 describe('Mini Lens for TypeScript', () => {
@@ -25,7 +28,7 @@ describe('Mini Lens for TypeScript', () => {
     });
 
     describe('Through nested objects', () => {
-        const lensPerson2Street = L<Person>().to('address', 'city');
+        const lensPerson2Street = L<Person>().to('address', 'street');
 
         it('can view', () => {
             expect(lensPerson2Street.view({ address: { street: 'foo' }, type: 'Person' })).toEqual('foo');
@@ -66,6 +69,7 @@ describe('Mini Lens for TypeScript', () => {
 
     describe('chain lens / cast through union type', () => {
         const lens4CompanyTitle = L<House>().to('owner')
+            .castIf<Company>(isCompany)
             .chain(L<Company>().to('title'));
 
         it('can view', () => {            
@@ -85,7 +89,7 @@ describe('Mini Lens for TypeScript', () => {
             const house: House = { owner: undefined };
             const person: Person = { address: { street: 'queen' }, type: 'Person' };
             
-            const withOwner = lensFrom<House>().to('owner').set(house, person);
+            const withOwner = L<House>().to('owner').castIf(isPerson).set(house, person);
             expect(withOwner).toEqual({ owner: person });
         });
         
@@ -98,8 +102,8 @@ describe('Mini Lens for TypeScript', () => {
     });
 
     describe('chain and cast galore', () => {
-        const lensGalore = L<House>().to('owner')
-            .chain(L<Person>().to('address', 'neighbor', 'owner'))
+        const lensGalore = L<House>().to('owner').castIf(isPerson)
+            .chain(L<Person>().to('address', 'neighbor', 'owner').castIf(isCompany))
             .chain(L<Company>().to('title'));
 
         it('with valid data', () => {
@@ -136,7 +140,9 @@ describe('Mini Lens for TypeScript', () => {
     });
 
     describe('chain with path', () => {
-        const lens4CompanyTitle = L<House>().to('owner', 'title');
+        const lens4CompanyTitle = L<House>().to('owner')
+            .castIf<Company>(isCompany)
+            .then.to('title');
 
         it('can view', () => {            
             expect(lens4CompanyTitle.view({ owner: { title: 'title foo', type: 'Company' } })).toEqual('title foo');
@@ -160,7 +166,9 @@ describe('Mini Lens for TypeScript', () => {
     });
 
     describe('chain with path -- aliased', () => {
-        const lens4CompanyTitle = lensFrom<House>().to('owner', 'title');
+        const lens4CompanyTitle = L<House>().to('owner')
+            .castIf<Company>(isCompany)
+            .then.to('title');
 
         it('can view', () => {            
             expect(lens4CompanyTitle.view({ owner: { title: 'title foo', type: 'Company' } })).toEqual('title foo');
@@ -181,5 +189,29 @@ describe('Mini Lens for TypeScript', () => {
             const updated = lens4CompanyTitle.set(withoutCompany, 'title bar');
             expect(updated).toEqual(withoutCompany);
         });
+    });
+
+    describe('work with arrays', () => {
+        const l = L<string[]>().to(1);
+        const strings = [ 'aaa', 'bbb', 'ccc' ];
+
+        it('can view thru array', () => {
+            const oneChar = l.view(strings);
+
+            expect(oneChar).toEqual('bbb');
+        })
+
+        it('can set thru array', () => {
+            const actual = l.set(strings, 'zzz');
+
+            expect(actual).toEqual([ 'aaa', 'zzz', 'ccc' ]);
+        })
+    });
+
+    describe('works with extended types', () => {
+        const lStudentToName = L<Person>().to('name');
+        const student : Student = { 'address': null, 'school': 'Snakebite', 'type': 'Person' };
+
+        // this should compile
     });
 });
